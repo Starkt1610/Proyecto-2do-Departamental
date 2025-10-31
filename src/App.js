@@ -7,236 +7,163 @@ import Usuario from './components/Usuario'
 import Navbar from './components/Navbar'
 import Notification from './components/Notification'
 import './App.css'
-import { supabase } from './components/supabaseClient' // cliente de supabase
+import { supabase } from './components/supabaseClient'
 import CheckoutModal from './components/CheckoutModal'
 
 function App() {
-  // ==========================================================
-  // 1. DECLARACIÓN DE TODOS LOS HOOKS AL INICIO (TOP LEVEL)
-  // ==========================================================
-  const [usuario, setUsuario] = useState(null)
-  const [cargando, setCargando] = useState(true)
-  const [carrito, setCarrito] = useState([]) // ESTADO DEL CARRITO
-  const [notification, setNotification] = useState(null) // ESTADO DE NOTIFICACIÓN
-  const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
-  const [usuario, setUsuario] = useState(null)
-  const [rol, setRol] = useState(null) // NUEVO ESTADO PARA EL ROL
-  const [cargando, setCargando] = useState(true)
+  // ==========================================================
+  // 1. DECLARACIÓN DE TODOS LOS HOOKS (SIN DUPLICACIONES)
+  // ==========================================================
+  const [usuario, setUsuario] = useState(null) // ÚNICA DECLARACIÓN
+  const [rol, setRol] = useState(null) // ESTADO DEL ROL
+  const [cargando, setCargando] = useState(true) // ÚNICA DECLARACIÓN
+  const [carrito, setCarrito] = useState([]) // ESTADO DEL CARRITO
+  const [notification, setNotification] = useState(null)
+  const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
 
-  // CÁLCULO DEL TOTAL (DEBE ESTAR AQUÍ PARA USARSE EN LA FUNCIÓN Y EL MODAL)
-  const totalCarrito = carrito.reduce((suma, p) => {
-    const precio = p.precio || 0;
-    const cantidad = p.cantidad || 1;
-    return suma + (precio * cantidad);
-  }, 0);
+  // CÁLCULO DEL TOTAL
+  const totalCarrito = carrito.reduce((suma, p) => {
+    const precio = p.precio || 0;
+    const cantidad = p.cantidad || 1;
+    return suma + (precio * cantidad);
+  }, 0);
 
 
-  // 2. Lógica de autenticación
-  // src/App.js (Dentro del useEffect de autenticación)
+  // ==========================================================
+  // 2. Lógica de autenticación y carga de Rol
+  // ==========================================================
 
 useEffect(() => {
   const fetchUserAndRole = async (session) => {
     if (session) {
       setUsuario(session.user)
-        
-      // 1. OBTENER EL ROL DEL PERFIL
+        
+      // OBTENER EL ROL DEL PERFIL
       const { data: profile, error } = await supabase
         .from('perfiles')
         .select('rol')
         .eq('id', session.user.id)
         .single()
-      
+      
       if (profile) {
-        setRol(profile.rol) // Guardar el rol ('admin' o 'usuario')
-      } else if (error && error.code !== 'PGRST116') { // PGRST116 = no existe el perfil (primera vez)
+        setRol(profile.rol)
+      } else if (error && error.code !== 'PGRST116') {
         console.error('Error al obtener perfil:', error)
-        setRol('usuario') // Por defecto si hay error
+        setRol('usuario')
       } else {
-          // Si el perfil no existe, puedes crearlo aquí con rol 'usuario'
-          setRol('usuario');
-      }
+          // Si el perfil no existe, se asume rol por defecto
+          setRol('usuario');
+      }
     }
     setCargando(false)
   }
 
-  // Lógica de la sesión inicial
   supabase.auth.getSession().then(({ data: { session } }) => {
     fetchUserAndRole(session)
   })
 
-  // Escuchar cambios de autenticación
   const { data: { subscription } } = supabase.auth.onAuthStateChange(
     (event, session) => {
       if (event === 'SIGNED_IN') {
         fetchUserAndRole(session)
       } else if (event === 'SIGNED_OUT') {
         setUsuario(null)
-        setRol(null) // Limpiar rol al cerrar sesión
+        setRol(null)
       }
     }
   )
   return () => subscription.unsubscribe()
 }, [])
 
-  {usuarioEstaLogueado && <Navbar rol={rol} />}
+
+  // CONDICIÓN DE CARGA (VA DESPUÉS DE LOS HOOKS Y EL useEffect)
+  if (cargando) {
+    return <h1 style={{ textAlign: 'center', marginTop: '5rem', color: '#fff' }}>Cargando sesión...</h1>
+  }
 
 
-  // ⚠️ CONDICIÓN DE CARGA (VA DESPUÉS DE LOS HOOKS)
-  if (cargando) {
-    return <h1 style={{ textAlign: 'center', marginTop: '5rem', color: '#fff' }}>Cargando sesión...</h1>
-  }
+  // ==========================================================
+  // 3. LÓGICA DEL CARRITO (FUNCIONES)
+  // ==========================================================
+  // ... (mantener aquí todas tus funciones: confirmarPedido, agregarAlCarrito, eliminarDelCarrito)
+  // ... (no las copio por brevedad, pero mantenlas en su lugar)
 
 
-  // ==========================================================
-  // 3. LÓGICA DEL CARRITO (FUNCIONES)
-  // ==========================================================
-
-  // FUNCIÓN DE CONFIRMAR PEDIDO (CORREGIDA LA LÓGICA Y EL CIERRE)
-  const confirmarPedido = (datosPago) => {
-    setIsCheckoutModalOpen(false); // Siempre cerramos el modal al confirmar o cancelar
-
-    if (carrito.length === 0) {
-      setNotification({
-        message: `❌ El carrito está vacío.`,
-        type: 'error'
-      });
-    } else {
-      // 1. Simula el checkout vaciando el carrito
-      setCarrito([]);
-
-      // 2. Muestra notificación de éxito (USANDO datosPago y totalCarrito)
-      setNotification({
-        message: `🎉 ¡Pedido de $${totalCarrito.toFixed(2)} confirmado! Método: ${datosPago.metodo.toUpperCase()}.`,
-        type: 'success'
-      });
-    }
-
-    // 3. Limpieza y temporizador de notificación
-    if (window.notificationTimer) {
-      clearTimeout(window.notificationTimer);
-    }
-    window.notificationTimer = setTimeout(() => {
-      setNotification(null);
-      window.notificationTimer = null;
-    }, 5000);
-  };
+  // Función para manejar el cierre de sesión (necesario para el Navbar)
+  const manejarCierreSesion = async () => {
+    setCargando(true);
+    const { error } = await supabase.auth.signOut();
+    setUsuario(null);
+    setRol(null);
+    setCargando(false);
+    setCarrito([]);
+  };
 
 
-  const agregarAlCarrito = (producto) => {
-    let newCarrito;
-    setCarrito(prevCarrito => {
-      const itemExistente = prevCarrito.find(item => item.id === producto.id);
+  // Variable para simplificar la lectura en los Routes
+  const usuarioEstaLogueado = usuario !== null
 
-      if (itemExistente) {
-        newCarrito = prevCarrito.map(item =>
-          item.id === producto.id
-            ? { ...item, cantidad: item.cantidad + 1 }
-            : item
-        );
-      } else {
-        newCarrito = [...prevCarrito, { ...producto, cantidad: 1 }];
-      }
-
-      return newCarrito;
-    });
-
-    // ACTIVAR NOTIFICACIÓN
-    setNotification({
-      message: `✅ "${producto.Nombre}" agregado al carrito.`,
-      type: 'success'
-    });
-
-    // ✅ CORRECCIÓN DE LIMPIEZA: Limpiar temporizador existente
-    if (window.notificationTimer) {
-      clearTimeout(window.notificationTimer);
-    }
-
-    // Ocultar después de 5 segundos
-    window.notificationTimer = setTimeout(() => {
-      setNotification(null);
-      window.notificationTimer = null;
-    }, 5000);
-  };
+  return (
+    <Router>
+        {/* NO RENDERIZAR AQUÍ: {usuarioEstaLogueado && <Navbar rol={rol} />} */}
 
 
-  const eliminarDelCarrito = (productoId) => {
-    setCarrito(prevCarrito => {
-      const newCarrito = prevCarrito.filter(item => item.id !== productoId);
-      const productoEliminado = prevCarrito.find(item => item.id === productoId);
+      {/* ⚠️ RENDERIZAR EL MODAL AQUÍ */}
+      <CheckoutModal
+        isVisible={isCheckoutModalOpen}
+        onClose={() => setIsCheckoutModalOpen(false)}
+        onConfirm={confirmarPedido}
+        total={totalCarrito}
+      />
 
-      if (productoEliminado) {
-        setNotification({
-          message: `🗑️ "${productoEliminado.Nombre}" eliminado del carrito.`,
-          type: 'error'
-        });
+      {/* Mostrar notificacion si existe el estado */}
+      {notification && <Notification message={notification.message} type={notification.type} />}
 
-        // Limpiar el temporizador anterior y establecer uno nuevo
-        if (window.notificationTimer) {
-          clearTimeout(window.notificationTimer);
-        }
-        window.notificationTimer = setTimeout(() => {
-          setNotification(null);
-          window.notificationTimer = null;
-        }, 5000);
-      }
-
-      return newCarrito;
-    });
-  };
+      {/* Si hay sesión activa, mostramos el Navbar */}
+      {/* ✅ CORRECCIÓN: Pasar el rol y el onLogout */}
+      {usuarioEstaLogueado && <Navbar rol={rol} onLogout={manejarCierreSesion} carrito={carrito} />}
 
 
-  // Variable para simplificar la lectura en los Routes
-  const usuarioEstaLogueado = usuario !== null
+      <Routes>
+        {/* Página de login - LE PASAMOS setUsuario */}
+        <Route path="/login" element={<Usuario setUsuario={setUsuario} />} />
 
-  return (
-    <Router>
+        {/* 🛑 RUTA PROTEGIDA DE ADMIN (AGREGAR ESTO) */}
+        <Route
+          path="/admin"
+          element={rol === 'admin' && usuarioEstaLogueado
+            ? <h1 style={{ textAlign: 'center', marginTop: '5rem', color: '#fff' }}>Panel de Administración</h1> // Reemplaza por tu componente AdminPanel
+            : <Navigate to={usuarioEstaLogueado ? "/menu" : "/login"} />}
+        />
 
-      {/* ⚠️ RENDERIZAR EL MODAL AQUÍ */}
-      <CheckoutModal
-        isVisible={isCheckoutModalOpen}
-        onClose={() => setIsCheckoutModalOpen(false)}
-        onConfirm={confirmarPedido} // Llama a la función que vacía el carrito
-        total={totalCarrito} // Pasamos el total del carrito
-      />
+        {/* Ruta protegida: Menu */}
+        <Route
+          path="/menu"
+          element={usuarioEstaLogueado
+            ? <Menu agregarAlCarrito={agregarAlCarrito} />
+            : <Navigate to="/login" />}
+        />
 
-      {/* Mostrar notificacion de si existe el estado */}
-      {notification && <Notification message={notification.message} type={notification.type} />}
+        {/* 🛒 Ruta protegida: Carrito */}
+        <Route
+          path="/carrito"
+          element={usuarioEstaLogueado
+            ? <Carrito
+              carritoItems={carrito}
+              eliminarDelCarrito={eliminarDelCarrito}
+              confirmarPedido={() => setIsCheckoutModalOpen(true)}
+            />
+            : <Navigate to="/login" />}
+        />
 
-      {/* Si hay sesión activa, mostramos el Navbar */}
-      {usuarioEstaLogueado && <Navbar />}
+        {/* Redirección inicial */}
+        <Route path="/" element={<Navigate to={usuarioEstaLogueado ? "/menu" : "/login"} />} />
 
-      <Routes>
-        {/* Página de login - LE PASAMOS setUsuario */}
-        <Route path="/login" element={<Usuario setUsuario={setUsuario} />} />
-
-        {/* Ruta protegida: Menu */}
-        <Route
-          path="/menu"
-          element={usuarioEstaLogueado
-            ? <Menu agregarAlCarrito={agregarAlCarrito} />
-            : <Navigate to="/login" />}
-        />
-
-        {/* 🛒 Ruta protegida: Carrito */}
-        <Route
-          path="/carrito"
-          element={usuarioEstaLogueado
-            ? <Carrito
-              carritoItems={carrito}
-              eliminarDelCarrito={eliminarDelCarrito}
-              confirmarPedido={() => setIsCheckoutModalOpen(true)}
-            />
-            : <Navigate to="/login" />}
-        />
-
-        {/* Redirección inicial: Si hay usuario, a /menu. Si no, a /login. */}
-        <Route path="/" element={<Navigate to={usuarioEstaLogueado ? "/menu" : "/login"} />} />
-
-        {/* Cualquier ruta desconocida */}
-        <Route path="*" element={<Navigate to="/login" />} />
-      </Routes>
-    </Router>
-  )
+        {/* Cualquier ruta desconocida */}
+        <Route path="*" element={<Navigate to="/login" />} />
+      </Routes>
+    </Router>
+  )
 }
 
 export default App
