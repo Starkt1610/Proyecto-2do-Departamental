@@ -19,6 +19,9 @@ function App() {
   const [carrito, setCarrito] = useState([]) // ESTADO DEL CARRITO
   const [notification, setNotification] = useState(null) // ESTADO DE NOTIFICACIÓN
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
+  const [usuario, setUsuario] = useState(null)
+  const [rol, setRol] = useState(null) // NUEVO ESTADO PARA EL ROL
+  const [cargando, setCargando] = useState(true)
 
   // CÁLCULO DEL TOTAL (DEBE ESTAR AQUÍ PARA USARSE EN LA FUNCIÓN Y EL MODAL)
   const totalCarrito = carrito.reduce((suma, p) => {
