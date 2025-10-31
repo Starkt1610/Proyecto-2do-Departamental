@@ -1,0 +1,337 @@
+/* 🎨 Estilos globales */
+
+body {
+  margin: 0;
+  font-family: 'Poppins', 'Segoe UI', Roboto, sans-serif;
+  background-color: #171538;
+  /* Fondo principal oscuro */
+  color: #ffffff;
+  /* Texto blanco */
+}
+
+.icono-check-pequeno {
+  width: 24px;
+  height: 24px;
+  margin-right: 0.5rem;
+}
+
+/* 🧭 Barra de navegación */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #1e3a8a;
+  /* Azul PlayStation */
+  color: white;
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.navbar h1 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.navbar a {
+  color: white;
+  text-decoration: none;
+  margin-left: 1rem;
+  font-weight: 500;
+}
+
+.navbar a:hover {
+  text-decoration: underline;
+  color: #93c5fd;
+  /* Azul claro al pasar el ratón */
+}
+
+/* 🛒 Lista de productos */
+.product-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.5rem;
+  padding: 2rem;
+}
+
+.product-card {
+  background: #2b2a4c;
+  /* Gris oscuro para el tema */
+  color: #ffffff;
+  /* Texto blanco en la tarjeta */
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  /* Sombra más pronunciada */
+  text-align: center;
+  padding: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.7);
+}
+
+/* 🖼️ CORRECCIÓN CLAVE PARA LA IMAGEN */
+.product-card img {
+  width: 100% !important;
+  /* Forzamos el ancho al 100% */
+  height: 200px !important;
+  /* Forzamos la altura a 200px */
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  /* Asegúrate de que el contenedor de la imagen no tenga un padding extraño */
+  display: block;
+}
+
+.product-card h3 {
+  margin: 0.8rem 0 0.3rem;
+  color: #93c5fd;
+  /* Título en azul claro */
+}
+
+.product-card p {
+  margin: 0.3rem 0;
+}
+
+.product-card button {
+  background-color: #0077ff;
+  border: none;
+  color: rgb(255, 255, 255);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  margin-bottom: 0.5rem;
+}
+
+.product-card button:hover {
+  background-color: #005fcc;
+}
+
+/* 🧾 Carrito */
+.cart-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  background: #2b2a4c;
+  /* Gris oscuro para el tema */
+  color: #ffffff;
+  /* Texto blanco */
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  padding: 1.5rem;
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #4a456e;
+  /* Borde gris oscuro */
+  padding: 0.8rem 0;
+}
+
+.cart-item:last-child {
+  border-bottom: none;
+}
+
+/* Contenedor de la lista */
+.cart-list {
+    display: flex;
+    flex-direction: column;
+    /* Ajusta el espacio entre los ítems */
+    gap: 0.5rem; 
+}
+
+/* Contenedor de la información del ítem (imagen + texto) */
+.cart-item-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-grow: 1; /* Permite que el contenedor de info crezca */
+}
+
+/* 🖼️ IMAGEN DEL CARRITO: Hacemos la imagen pequeña */
+.cart-item-img {
+    width: 50px; /* Ancho pequeño, como un ícono */
+    height: 70px; /* Altura de portada pequeña */
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+/* Estilo del texto del ítem */
+.cart-item-details {
+    font-size: 1rem;
+    color: #f5f5f5;
+}
+
+/* Botón Eliminar */
+.cart-item-delete-btn {
+    background: transparent;
+    color: #ff5555; /* Rojo de error */
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.2s;
+}
+
+.cart-item-delete-btn:hover {
+    color: #ff9999;
+}
+
+/* Total */
+.cart-total {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 1rem;
+    padding-top: 0.5rem;
+    border-top: 2px solid #4a456e; /* Separador */
+    text-align: right;
+    color: #93c5fd; /* Azul claro para el total */
+}
+
+/* Botón Confirmar Pedido */
+.cart-checkout-btn {
+    background-color: #00b894; /* Verde de éxito */
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 6px;
+    margin-top: 1rem;
+    width: 100%;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.cart-checkout-btn:hover {
+    background-color: #00997d;
+}
+
+/* 🔐 Login */
+.login-container {
+  max-width: 400px;
+  margin: 6rem auto;
+  background: #2b2a4c;
+  /* Gris oscuro para el tema */
+  color: #ffffff;
+  /* Texto blanco */
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.login-container h2 {
+  color: #93c5fd;
+  /* Título en azul claro */
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.login-container input {
+  width: 100%;
+  padding: 0.8rem;
+  margin: 0.5rem 0;
+  border: 1px solid #4a456e;
+  /* Borde oscuro */
+  background-color: #3f3e5e;
+  /* Fondo de input ligeramente más claro */
+  color: white;
+  /* Texto del input blanco */
+  border-radius: 6px;
+}
+
+.login-container button {
+  width: 100%;
+  background-color: #0077ff;
+  border: none;
+  color: white;
+  padding: 0.8rem;
+  border-radius: 6px;
+  margin-top: 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.login-container button:hover {
+  background-color: #005fcc;
+}
+
+/* ⚙️ Utilidades */
+.text-center {
+  text-align: center;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 🖼️ ESTILOS PARA EL MODAL DE PAGO */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7); /* Fondo semi-transparente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Asegura que esté por encima de todo */
+}
+
+.modal-content {
+    /* Reutiliza los estilos del login-container para el fondo y padding */
+    max-width: 500px;
+    width: 90%;
+    margin: 0; /* Quita el margen que tenía el login */
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.modal-actions button {
+    flex-grow: 1;
+    padding: 0.8rem;
+}
+
+.btn-cancel {
+    background-color: #6c757d; /* Gris para cancelar */
+}
+.btn-cancel:hover {
+    background-color: #5a6268;
+}
+
+/* Estilo para los inputs que están en un grupo (MM/AA y CVV) */
+.input-group {
+    display: flex;
+    gap: 1rem;
+}
+
+.input-group input {
+    flex-grow: 1;
+}
+
+/* Estilo para el select */
+.modal-content select {
+    width: 100%;
+    padding: 0.8rem;
+    margin: 0.5rem 0 1rem;
+    border: 1px solid #4a456e;
+    background-color: #3f3e5e;
+    color: white;
+    border-radius: 6px;
+    /* Necesario para que el color del texto de la opción se vea en algunos navegadores */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
