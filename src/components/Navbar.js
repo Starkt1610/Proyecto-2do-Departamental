@@ -15,6 +15,14 @@ function Navbar() {
     <nav className="navbar">
       <h1>🕹️ Tienda PS4</h1>
 
+    {rol === 'admin' && (
+    <Link to="/admin">
+        <button className="btn-admin">
+            Admin Panel
+        </button>
+    </Link>
+)}
+
       <div>
         <Link to="/menu">Inicio</Link>
         <Link to="/carrito">🛒 Carrito</Link>
@@ -35,5 +43,6 @@ function Navbar() {
     </nav>
   )
 }
+
 
 export default Navbar
