@@ -32,27 +32,53 @@ function App() {
 
 
   // 2. Lógica de autenticación
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setUsuario(session.user)
-      }
-      setCargando(false) // Termina la carga después de verificar
-    })
+  // src/App.js (Dentro del useEffect de autenticación)
 
-    // Escuchar cambios de autenticación en tiempo real
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (event === 'SIGNED_IN') {
-          setUsuario(session.user)
-        } else if (event === 'SIGNED_OUT') {
-          setUsuario(null)
-        }
+useEffect(() => {
+  const fetchUserAndRole = async (session) => {
+    if (session) {
+      setUsuario(session.user)
+        
+      // 1. OBTENER EL ROL DEL PERFIL
+      const { data: profile, error } = await supabase
+        .from('perfiles')
+        .select('rol')
+        .eq('id', session.user.id)
+        .single()
+      
+      if (profile) {
+        setRol(profile.rol) // Guardar el rol ('admin' o 'usuario')
+      } else if (error && error.code !== 'PGRST116') { // PGRST116 = no existe el perfil (primera vez)
+        console.error('Error al obtener perfil:', error)
+        setRol('usuario') // Por defecto si hay error
+      } else {
+          // Si el perfil no existe, puedes crearlo aquí con rol 'usuario'
+          setRol('usuario');
       }
-    )
+    }
+    setCargando(false)
+  }
 
-    return () => subscription.unsubscribe()
-  }, [])
+  // Lógica de la sesión inicial
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    fetchUserAndRole(session)
+  })
+
+  // Escuchar cambios de autenticación
+  const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    (event, session) => {
+      if (event === 'SIGNED_IN') {
+        fetchUserAndRole(session)
+      } else if (event === 'SIGNED_OUT') {
+        setUsuario(null)
+        setRol(null) // Limpiar rol al cerrar sesión
+      }
+    }
+  )
+  return () => subscription.unsubscribe()
+}, [])
+
+  {usuarioEstaLogueado && <Navbar rol={rol} />}
 
 
   // ⚠️ CONDICIÓN DE CARGA (VA DESPUÉS DE LOS HOOKS)
