@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/Proyecto-2do-Departamental/static/css/main.95576825.css",
+    "main.js": "/Proyecto-2do-Departamental/static/js/main.cd889c66.js",
+    "index.html": "/Proyecto-2do-Departamental/index.html",
+    "main.95576825.css.map": "/Proyecto-2do-Departamental/static/css/main.95576825.css.map",
+    "main.cd889c66.js.map": "/Proyecto-2do-Departamental/static/js/main.cd889c66.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.95576825.css",
+    "static/js/main.cd889c66.js"
+  ]
+}
